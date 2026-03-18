@@ -1,0 +1,171 @@
+# webserv-tester
+
+*This project has been created as part of the 42 curriculum.*
+
+An HTTP tester for the **Webserv** project. It auto-generates the required file infrastructure and configuration, then runs 100+ tests covering everything the subject requires: static files, upload, redirection, directory listing, CGI, error pages, body limits, chunked encoding, HTTP smuggling, slowloris, and more.
+
+---
+
+## Requirements
+
+- Python 3.6+
+- No external dependencies — stdlib only
+
+---
+
+## Quickstart
+
+```bash
+# 1. Clone
+git clone https://github.com/<you>/webserv-tester
+cd webserv-tester
+
+# 2. Generate the file infrastructure and tester.conf
+python3 tester.py init
+
+# 3. Start your server with the generated config
+./webserv tester.conf
+
+# 4. Run the tests
+python3 tester.py run
+```
+
+---
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `python3 tester.py init` | Creates `www/`, `logs/`, all HTML files, and `tester.conf` |
+| `python3 tester.py run` | Runs all tests (checks infra + server first) |
+| `python3 tester.py check` | Shows infra and server status without running tests |
+| `python3 tester.py clean` | Deletes all generated files (fresh start) |
+| `python3 tester.py help` | Displays usage and current config |
+
+### Options
+
+```bash
+python3 tester.py run   --host 127.0.0.1  # default
+python3 tester.py run   --port 8080        # default
+python3 tester.py init  --host 127.0.2.1 --port 9090
+```
+
+`--host` and `--port` affect both the generated `tester.conf` and the requests sent during tests.
+
+---
+
+## What gets generated
+
+Running `init` creates this structure next to `tester.py`:
+
+```
+webserv-tester/
+├── tester.py
+├── tester.conf          ← ready to pass to ./webserv
+├── www/
+│   ├── index.html
+│   ├── contact.html
+│   ├── uploads/         ← upload destination
+│   ├── files/           ← directory listing (autoindex on)
+│   │   └── sample.txt
+│   ├── cgi-bin/
+│   │   └── hello.py     ← CGI test script (chmod 755)
+│   └── errors/
+│       ├── 400.html
+│       ├── 403.html
+│       ├── 404.html
+│       ├── 405.html
+│       ├── 413.html
+│       ├── 431.html
+│       ├── 500.html
+│       ├── 505.html
+│       └── error.html
+└── logs/
+    ├── access.log
+    └── error.log
+```
+
+---
+
+## Configuration overview
+
+The generated `tester.conf` defines two virtual hosts on the same port:
+
+**localhost** — main vhost
+| Route | Methods | Notes |
+|---|---|---|
+| `/` | GET | static root |
+| `/contacts` | GET POST DELETE | `client_max_body_size 1MB` |
+| `/upload` | POST | stores files in `www/uploads/` |
+| `/upload/delete` | DELETE | deletes uploaded files |
+| `/files` | GET | `autoindex on` — directory listing |
+| `/old` | — | `301 →  /` |
+| `/temp` | — | `302 → /contacts` |
+| `/cgi-bin` | GET POST | `.py` executed with `python3` |
+
+**secondary** — restricted vhost (`client_max_body_size 0`)
+| Route | Methods |
+|---|---|
+| `/upload` | POST (`client_max_body_size 1MB` override) |
+| `/delete` | DELETE |
+
+---
+
+## Test coverage
+
+| Section | # tests | Subject requirement |
+|---|---|---|
+| Valid requests | 10 | GET / POST / DELETE |
+| Upload | 5 | *"clients must be able to upload files"* |
+| Redirection | 2 | *"HTTP redirection"* |
+| Directory listing | 3 | *"enabling/disabling directory listing"* |
+| CGI | 3 | *"execution of CGI based on file extension"* |
+| Methods | 14 | allowed / forbidden / malformed |
+| Headers | 20 | malformed, missing, injected, too long |
+| Body | 15 | size limits, chunked, Content-Length edge cases |
+| URI | 14 | traversal, encoding, null bytes, length |
+| Protocol | 7 | HTTP version handling |
+| Request line format | 7 | CRLF, spacing, tabs |
+| Static files | 3 | *"serve a fully static website"* |
+| Error pages | 3 | *"must have default error pages"* |
+| Response headers | 3 | Content-Type, Content-Length presence |
+| HTTP Smuggling | 3 | CL-TE, TE obfuscation, chunk overflow |
+| Pipelining | 2 | multiple requests on one connection |
+| Slowloris / DoS | 2 | *"server must remain available at all times"* |
+| Unicode / Encoding | 2 | overlong UTF-8, double percent-encoding |
+
+**Total: 118 tests**
+
+---
+
+## Output format
+
+```
+  [PASS]  VALID_GET                                     HTTP/1.1 200 OK  (1.2 ms)
+  [FAIL]  CHUNKED_VALID                                 got [HTTP/1.1 500 ...]  expected 200|201
+  [ERR ]  BODY_TOO_BIG                                  [Errno 104] Connection reset  (expected 413)
+```
+
+A progress bar summarises results at the end:
+
+```
+  ████████████████████░░░░░░░░░░  98 passed / 4 failed / 1 errors / 103 total
+```
+
+---
+
+## Behaviour without arguments
+
+Running `python3 tester.py` with no arguments behaves automatically:
+- If the infrastructure doesn't exist yet → runs `init`
+- If it exists but the server isn't up → prints the launch command and exits
+- If it exists and the server is up → runs all tests
+
+---
+
+## Notes
+
+- The CGI test requires `python3` at `/usr/bin/python3`. Adjust `cgi_extension` in `tester.conf` if your path differs.
+- `clean` removes `www/`, `logs/`, and `tester.conf`. Your `tester.py` is never touched.
+- Tests marked `(200|201)` or `(200|404)` accept multiple valid codes — implementations may differ on details the subject leaves open.
+- The subject says *"a request to your server should never hang indefinitely"* — the slowloris tests verify exactly this.
