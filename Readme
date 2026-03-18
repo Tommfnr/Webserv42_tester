@@ -22,17 +22,17 @@
 ⚙️ Configure ton serveur automatiquement
 🧪 Lance **118 tests** ultra stricts
 
-👉 Objectif : **casser ton serveur**
+👉 Objectif : **casser ton serveur avant la moulinette**
 
 ---
 
 ## ⚡ **Features**
 
-* 🔥 +100 tests couvrant TOUT le sujet
-* 📦 Setup automatique (zéro config manuelle)
+* 🔥 +100 tests couvrant tout le sujet
+* 📦 Setup automatique (zéro configuration)
 * 🧠 Détection d’erreurs subtiles
-* 🛡️ Tests de sécurité (smuggling, slowloris…)
-* ⚡ Ultra rapide et lisible
+* 🛡️ Tests de sécurité (HTTP smuggling, slowloris…)
+* ⚡ Rapide, lisible et efficace
 
 ---
 
@@ -62,13 +62,13 @@ python3 tester.py run
 
 ## 🧰 **Commandes**
 
-| Commande | Description          |
-| -------- | -------------------- |
-| `init`   | Génère toute l’infra |
-| `run`    | Lance tous les tests |
-| `check`  | Vérifie sans tester  |
-| `clean`  | Reset complet        |
-| `help`   | Aide                 |
+| Commande | Description                   |
+| -------- | ----------------------------- |
+| `init`   | Génère toute l’infrastructure |
+| `run`    | Lance tous les tests          |
+| `check`  | Vérifie sans exécuter         |
+| `clean`  | Réinitialisation complète     |
+| `help`   | Affiche l’aide                |
 
 ```bash
 python3 tester.py run --host 127.0.0.1 --port 8080
@@ -77,67 +77,6 @@ python3 tester.py run --host 127.0.0.1 --port 8080
 ---
 
 ## 📁 **Structure générée**
-
-```
-www/# 🧪 webserv-tester
-
-*Ce projet a été conçu dans le cadre du cursus 42.*
-
-Un outil de test HTTP complet pour le projet **Webserv**. Il génère automatiquement l’infrastructure de fichiers ainsi qu’une configuration prête à l’emploi, puis exécute plus de **100 tests** couvrant l’ensemble des exigences du sujet : fichiers statiques, upload, redirections, listing de répertoires, CGI, pages d’erreur, limites de taille, encodage chunked, HTTP smuggling, attaques slowloris, etc.
-
----
-
-## ⚙️ Prérequis
-
-* Python **3.6+**
-* Aucune dépendance externe (stdlib uniquement)
-
----
-
-## 🚀 Démarrage rapide
-
-```bash
-# 1. Cloner le repo
-git clone https://github.com/Tommfnr/webserv-tester
-cd webserv-tester
-
-# 2. Générer l’infrastructure et la config
-python3 tester.py init
-
-# 3. Lancer votre serveur avec la config générée
-./webserv tester.conf
-
-# 4. Lancer les tests
-python3 tester.py run
-```
-
----
-
-## 🧰 Commandes
-
-| Commande                  | Description                                                          |
-| ------------------------- | -------------------------------------------------------------------- |
-| `python3 tester.py init`  | Génère `www/`, `logs/`, les fichiers HTML et `tester.conf`           |
-| `python3 tester.py run`   | Lance tous les tests (vérifie d’abord l’environnement et le serveur) |
-| `python3 tester.py check` | Vérifie l’état sans exécuter les tests                               |
-| `python3 tester.py clean` | Supprime tous les fichiers générés                                   |
-| `python3 tester.py help`  | Affiche l’aide et la configuration actuelle                          |
-
-### Options disponibles
-
-```bash
-python3 tester.py run   --host 127.0.0.1   # par défaut
-python3 tester.py run   --port 8080        # par défaut
-python3 tester.py init  --host 127.0.2.1 --port 9090
-```
-
-> Les options `--host` et `--port` s’appliquent à la fois à `tester.conf` et aux requêtes envoyées.
-
----
-
-## 📁 Structure générée
-
-Après `init`, vous obtenez :
 
 ```
 webserv-tester/
@@ -168,11 +107,11 @@ webserv-tester/
 
 ---
 
-## ⚙️ Aperçu de la configuration
+## ⚙️ **Configuration**
 
-Le fichier `tester.conf` configure deux virtual hosts :
+Le fichier `tester.conf` définit deux virtual hosts :
 
-### 🔹 `localhost` (principal)
+### 🔹 localhost (principal)
 
 | Route            | Méthodes        | Description                     |
 | ---------------- | --------------- | ------------------------------- |
@@ -183,110 +122,121 @@ Le fichier `tester.conf` configure deux virtual hosts :
 | `/files`         | GET             | Listing activé (`autoindex on`) |
 | `/old`           | —               | Redirection 301 → `/`           |
 | `/temp`          | —               | Redirection 302 → `/contacts`   |
-| `/cgi-bin`       | GET POST        | Exécution de scripts Python     |
+| `/cgi-bin`       | GET POST        | Exécution Python                |
 
-### 🔸 `secondary` (restreint)
+### 🔸 secondary (restreint)
 
-| Route     | Méthodes              |
-| --------- | --------------------- |
-| `/upload` | POST (override à 1MB) |
-| `/delete` | DELETE                |
-
----
-
-## 🧪 Couverture des tests
-
-| Catégorie          | Tests | Objectif                  |
-| ------------------ | ----- | ------------------------- |
-| Requêtes valides   | 10    | GET / POST / DELETE       |
-| Upload             | 5     | Upload de fichiers        |
-| Redirections       | 2     | Gestion HTTP              |
-| Listing            | 3     | Autoindex                 |
-| CGI                | 3     | Exécution dynamique       |
-| Méthodes           | 14    | Autorisées / refusées     |
-| Headers            | 20    | Cas invalides / injection |
-| Body               | 15    | Taille / chunked          |
-| URI                | 14    | Sécurité et parsing       |
-| Protocole          | 7     | Versions HTTP             |
-| Format requête     | 7     | CRLF / syntaxe            |
-| Fichiers statiques | 3     | Serving                   |
-| Pages d’erreur     | 3     | Gestion erreurs           |
-| Headers réponse    | 3     | Content-Type / Length     |
-| HTTP Smuggling     | 3     | CL/TE                     |
-| Pipelining         | 2     | Requêtes multiples        |
-| DoS / Slowloris    | 2     | Robustesse                |
-| Unicode            | 2     | Encodage                  |
-
-👉 **Total : 118 tests**
+| Route     | Méthodes            |
+| --------- | ------------------- |
+| `/upload` | POST (override 1MB) |
+| `/delete` | DELETE              |
 
 ---
 
-## 📊 Format de sortie
+## 🧪 **Couverture des tests**
+
+<p align="center">
+  <img src="https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif" width="400"/>
+</p>
+
+| Catégorie       | ✔️ |
+| --------------- | -- |
+| Requêtes HTTP   | ✅  |
+| Upload          | ✅  |
+| CGI             | ✅  |
+| Redirections    | ✅  |
+| Headers         | ✅  |
+| Body / Chunked  | ✅  |
+| Sécurité        | ✅  |
+| DoS / Slowloris | ✅  |
+
+👉 **118 tests au total**
+
+---
+
+## 📊 **Exemple de résultat**
+
+```bash
+[PASS] VALID_GET            HTTP/1.1 200 OK  (1.2 ms)
+[FAIL] CHUNKED_VALID        got 500 expected 200|201
+[ERR ] BODY_TOO_BIG         connection reset (expected 413)
+```
 
 ```
-[PASS] VALID_GET           HTTP/1.1 200 OK  (1.2 ms)
-[FAIL] CHUNKED_VALID       got [HTTP/1.1 500 ...]  expected 200|201
-[ERR ] BODY_TOO_BIG        Connection reset (expected 413)
-```
-
-Résumé final :
-
-```
-████████████████████░░░░░░░░░░  98 passed / 4 failed / 1 errors / 103 total
+████████████████████░░░░░░░░░░
+98 passed / 4 failed / 1 errors
 ```
 
 ---
 
-## 🤖 Comportement automatique
-
-Si vous lancez :
+## 🤖 **Mode automatique**
 
 ```bash
 python3 tester.py
 ```
 
-Le script s’adapte automatiquement :
-
-* 📦 Infra absente → `init`
-* 🚫 Serveur non lancé → affiche la commande à exécuter
-* ✅ Tout est prêt → lance les tests
+| Situation       | Action             |
+| --------------- | ------------------ |
+| ❌ Infra absente | → init             |
+| ⚠️ Serveur OFF  | → affiche commande |
+| ✅ Tout OK       | → lance les tests  |
 
 ---
 
-## 📝 Remarques
+## 🛡️ **Tests avancés**
 
-* Le CGI suppose `python3` disponible à `/usr/bin/python3`
+* 💣 HTTP Smuggling (CL/TE)
+* 🐌 Slowloris
+* 🔗 Pipelining
+* 🧬 Unicode / encodage
+* 📏 Limites de taille
+* 🚫 Headers malformés
+
+---
+
+## ⚠️ **Notes**
+
+* CGI nécessite `/usr/bin/python3`
 * `clean` supprime uniquement les fichiers générés
-* Certains tests acceptent plusieurs codes (`200|201`, etc.)
-* Les tests slowloris vérifient que le serveur **ne bloque jamais**
+* Certains tests acceptent plusieurs codes HTTP
+* Le serveur ne doit **jamais bloquer**
 
 ---
 
-## 💡 Objectif
+## 👤 **Auteur**
 
-Ce tester est conçu pour être :
-
-* **Exhaustif** → couvre tous les points du sujet
-* **Automatique** → zéro setup manuel
-* **Strict** → détecte les bugs subtils
-* **Pragmatique** → tolère les variations autorisées
+* login_42 : `Tommfnr`
 
 ---
 
-## 🧑‍💻 Contribution
+## 💡 **Pourquoi utiliser ce tester ?**
 
-Les contributions sont les bienvenues :
+* 🎯 Préparer la moulinette
+* 🔍 Détecter des bugs invisibles
+* 🧱 Rendre ton serveur robuste
+* ⚡ Gagner du temps
+
+---
+
+## ❤️ **Contribution**
+
+Contributions bienvenues :
 
 * Ajout de tests edge cases
-* Amélioration des messages d’erreur
-* Optimisation des performances
+* Amélioration des résultats
+* Optimisation
 
 ---
 
-## 📜 Licence
+## 🏁 **Conclusion**
 
-Libre d’utilisation dans le cadre du projet Webserv.
+> Si ton serveur passe ici…
+> 👉 il est prêt pour la guerre 😈
+
+<p align="center">
+  <img src="https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif" width="250"/>
+</p>
 
 ---
 
-**Bon courage pour ton Webserv 🚀**
+⭐ **N’hésite pas à star le repo si ça t’aide !**
