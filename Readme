@@ -1,4 +1,85 @@
-# 🧪 webserv-tester
+# 🧪 **webserv-tester**
+
+<p align="center">
+  <img src="https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif" width="250"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.6+-blue.svg"/>
+  <img src="https://img.shields.io/badge/Tests-118-success.svg"/>
+  <img src="https://img.shields.io/badge/Dependencies-None-lightgrey.svg"/>
+  <img src="https://img.shields.io/badge/42-Project-black.svg"/>
+  <img src="https://img.shields.io/badge/Status-Ready_to_break_your_server-red.svg"/>
+</p>
+
+---
+
+## 🚀 **Présentation**
+
+> Un tester HTTP **complet, automatique et sans pitié** pour le projet **Webserv**.
+
+💥 Génère toute l’infrastructure
+⚙️ Configure ton serveur automatiquement
+🧪 Lance **118 tests** ultra stricts
+
+👉 Objectif : **casser ton serveur**
+
+---
+
+## ⚡ **Features**
+
+* 🔥 +100 tests couvrant TOUT le sujet
+* 📦 Setup automatique (zéro config manuelle)
+* 🧠 Détection d’erreurs subtiles
+* 🛡️ Tests de sécurité (smuggling, slowloris…)
+* ⚡ Ultra rapide et lisible
+
+---
+
+## 🖥️ **Installation**
+
+```bash
+git clone https://github.com/Tommfnr/webserv-tester
+cd webserv-tester
+```
+
+---
+
+## ▶️ **Quickstart**
+
+```bash
+# 1. Initialisation
+python3 tester.py init
+
+# 2. Lancer ton serveur
+./webserv tester.conf
+
+# 3. Lancer les tests
+python3 tester.py run
+```
+
+---
+
+## 🧰 **Commandes**
+
+| Commande | Description          |
+| -------- | -------------------- |
+| `init`   | Génère toute l’infra |
+| `run`    | Lance tous les tests |
+| `check`  | Vérifie sans tester  |
+| `clean`  | Reset complet        |
+| `help`   | Aide                 |
+
+```bash
+python3 tester.py run --host 127.0.0.1 --port 8080
+```
+
+---
+
+## 📁 **Structure générée**
+
+```
+www/# 🧪 webserv-tester
 
 *Ce projet a été conçu dans le cadre du cursus 42.*
 
@@ -17,7 +98,7 @@ Un outil de test HTTP complet pour le projet **Webserv**. Il génère automatiqu
 
 ```bash
 # 1. Cloner le repo
-git clone https://github.com/<vous>/webserv-tester
+git clone https://github.com/Tommfnr/webserv-tester
 cd webserv-tester
 
 # 2. Générer l’infrastructure et la config
@@ -208,4 +289,4 @@ Libre d’utilisation dans le cadre du projet Webserv.
 
 ---
 
-**Bon courage pour votre Webserv 🚀**
+**Bon courage pour ton Webserv 🚀**
