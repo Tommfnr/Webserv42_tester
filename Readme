@@ -1,75 +1,75 @@
-# webserv-tester
+# 🧪 webserv-tester
 
-*This project has been created as part of the 42 curriculum.*
+*Ce projet a été conçu dans le cadre du cursus 42.*
 
-An HTTP tester for the **Webserv** project. It auto-generates the required file infrastructure and configuration, then runs 100+ tests covering everything the subject requires: static files, upload, redirection, directory listing, CGI, error pages, body limits, chunked encoding, HTTP smuggling, slowloris, and more.
-
----
-
-## Requirements
-
-- Python 3.6+
-- No external dependencies — stdlib only
+Un outil de test HTTP complet pour le projet **Webserv**. Il génère automatiquement l’infrastructure de fichiers ainsi qu’une configuration prête à l’emploi, puis exécute plus de **100 tests** couvrant l’ensemble des exigences du sujet : fichiers statiques, upload, redirections, listing de répertoires, CGI, pages d’erreur, limites de taille, encodage chunked, HTTP smuggling, attaques slowloris, etc.
 
 ---
 
-## Quickstart
+## ⚙️ Prérequis
+
+* Python **3.6+**
+* Aucune dépendance externe (stdlib uniquement)
+
+---
+
+## 🚀 Démarrage rapide
 
 ```bash
-# 1. Clone
-git clone https://github.com/<you>/webserv-tester
+# 1. Cloner le repo
+git clone https://github.com/<vous>/webserv-tester
 cd webserv-tester
 
-# 2. Generate the file infrastructure and tester.conf
+# 2. Générer l’infrastructure et la config
 python3 tester.py init
 
-# 3. Start your server with the generated config
+# 3. Lancer votre serveur avec la config générée
 ./webserv tester.conf
 
-# 4. Run the tests
+# 4. Lancer les tests
 python3 tester.py run
 ```
 
 ---
 
-## Commands
+## 🧰 Commandes
 
-| Command | Description |
-|---|---|
-| `python3 tester.py init` | Creates `www/`, `logs/`, all HTML files, and `tester.conf` |
-| `python3 tester.py run` | Runs all tests (checks infra + server first) |
-| `python3 tester.py check` | Shows infra and server status without running tests |
-| `python3 tester.py clean` | Deletes all generated files (fresh start) |
-| `python3 tester.py help` | Displays usage and current config |
+| Commande                  | Description                                                          |
+| ------------------------- | -------------------------------------------------------------------- |
+| `python3 tester.py init`  | Génère `www/`, `logs/`, les fichiers HTML et `tester.conf`           |
+| `python3 tester.py run`   | Lance tous les tests (vérifie d’abord l’environnement et le serveur) |
+| `python3 tester.py check` | Vérifie l’état sans exécuter les tests                               |
+| `python3 tester.py clean` | Supprime tous les fichiers générés                                   |
+| `python3 tester.py help`  | Affiche l’aide et la configuration actuelle                          |
 
-### Options
+### Options disponibles
 
 ```bash
-python3 tester.py run   --host 127.0.0.1  # default
-python3 tester.py run   --port 8080        # default
+python3 tester.py run   --host 127.0.0.1   # par défaut
+python3 tester.py run   --port 8080        # par défaut
 python3 tester.py init  --host 127.0.2.1 --port 9090
 ```
 
-`--host` and `--port` affect both the generated `tester.conf` and the requests sent during tests.
+> Les options `--host` et `--port` s’appliquent à la fois à `tester.conf` et aux requêtes envoyées.
 
 ---
 
-## What gets generated
+## 📁 Structure générée
 
-Running `init` creates this structure next to `tester.py`:
+Après `init`, vous obtenez :
 
 ```
 webserv-tester/
 ├── tester.py
-├── tester.conf          ← ready to pass to ./webserv
+├── tester.conf
 ├── www/
 │   ├── index.html
 │   ├── contact.html
-│   ├── uploads/         ← upload destination
-│   ├── files/           ← directory listing (autoindex on)
+│   ├── uploads/
+│   ├── files/
 │   │   └── sample.txt
 │   ├── cgi-bin/
-│   │   └── hello.py     ← CGI test script (chmod 755)
+│   │   └── hello.py
 │   └── errors/
 │       ├── 400.html
 │       ├── 403.html
@@ -87,85 +87,125 @@ webserv-tester/
 
 ---
 
-## Configuration overview
+## ⚙️ Aperçu de la configuration
 
-The generated `tester.conf` defines two virtual hosts on the same port:
+Le fichier `tester.conf` configure deux virtual hosts :
 
-**localhost** — main vhost
-| Route | Methods | Notes |
-|---|---|---|
-| `/` | GET | static root |
-| `/contacts` | GET POST DELETE | `client_max_body_size 1MB` |
-| `/upload` | POST | stores files in `www/uploads/` |
-| `/upload/delete` | DELETE | deletes uploaded files |
-| `/files` | GET | `autoindex on` — directory listing |
-| `/old` | — | `301 →  /` |
-| `/temp` | — | `302 → /contacts` |
-| `/cgi-bin` | GET POST | `.py` executed with `python3` |
+### 🔹 `localhost` (principal)
 
-**secondary** — restricted vhost (`client_max_body_size 0`)
-| Route | Methods |
-|---|---|
-| `/upload` | POST (`client_max_body_size 1MB` override) |
-| `/delete` | DELETE |
+| Route            | Méthodes        | Description                     |
+| ---------------- | --------------- | ------------------------------- |
+| `/`              | GET             | Site statique                   |
+| `/contacts`      | GET POST DELETE | Limite : 1MB                    |
+| `/upload`        | POST            | Upload vers `www/uploads/`      |
+| `/upload/delete` | DELETE          | Suppression de fichiers         |
+| `/files`         | GET             | Listing activé (`autoindex on`) |
+| `/old`           | —               | Redirection 301 → `/`           |
+| `/temp`          | —               | Redirection 302 → `/contacts`   |
+| `/cgi-bin`       | GET POST        | Exécution de scripts Python     |
 
----
+### 🔸 `secondary` (restreint)
 
-## Test coverage
-
-| Section | # tests | Subject requirement |
-|---|---|---|
-| Valid requests | 10 | GET / POST / DELETE |
-| Upload | 5 | *"clients must be able to upload files"* |
-| Redirection | 2 | *"HTTP redirection"* |
-| Directory listing | 3 | *"enabling/disabling directory listing"* |
-| CGI | 3 | *"execution of CGI based on file extension"* |
-| Methods | 14 | allowed / forbidden / malformed |
-| Headers | 20 | malformed, missing, injected, too long |
-| Body | 15 | size limits, chunked, Content-Length edge cases |
-| URI | 14 | traversal, encoding, null bytes, length |
-| Protocol | 7 | HTTP version handling |
-| Request line format | 7 | CRLF, spacing, tabs |
-| Static files | 3 | *"serve a fully static website"* |
-| Error pages | 3 | *"must have default error pages"* |
-| Response headers | 3 | Content-Type, Content-Length presence |
-| HTTP Smuggling | 3 | CL-TE, TE obfuscation, chunk overflow |
-| Pipelining | 2 | multiple requests on one connection |
-| Slowloris / DoS | 2 | *"server must remain available at all times"* |
-| Unicode / Encoding | 2 | overlong UTF-8, double percent-encoding |
-
-**Total: 118 tests**
+| Route     | Méthodes              |
+| --------- | --------------------- |
+| `/upload` | POST (override à 1MB) |
+| `/delete` | DELETE                |
 
 ---
 
-## Output format
+## 🧪 Couverture des tests
+
+| Catégorie          | Tests | Objectif                  |
+| ------------------ | ----- | ------------------------- |
+| Requêtes valides   | 10    | GET / POST / DELETE       |
+| Upload             | 5     | Upload de fichiers        |
+| Redirections       | 2     | Gestion HTTP              |
+| Listing            | 3     | Autoindex                 |
+| CGI                | 3     | Exécution dynamique       |
+| Méthodes           | 14    | Autorisées / refusées     |
+| Headers            | 20    | Cas invalides / injection |
+| Body               | 15    | Taille / chunked          |
+| URI                | 14    | Sécurité et parsing       |
+| Protocole          | 7     | Versions HTTP             |
+| Format requête     | 7     | CRLF / syntaxe            |
+| Fichiers statiques | 3     | Serving                   |
+| Pages d’erreur     | 3     | Gestion erreurs           |
+| Headers réponse    | 3     | Content-Type / Length     |
+| HTTP Smuggling     | 3     | CL/TE                     |
+| Pipelining         | 2     | Requêtes multiples        |
+| DoS / Slowloris    | 2     | Robustesse                |
+| Unicode            | 2     | Encodage                  |
+
+👉 **Total : 118 tests**
+
+---
+
+## 📊 Format de sortie
 
 ```
-  [PASS]  VALID_GET                                     HTTP/1.1 200 OK  (1.2 ms)
-  [FAIL]  CHUNKED_VALID                                 got [HTTP/1.1 500 ...]  expected 200|201
-  [ERR ]  BODY_TOO_BIG                                  [Errno 104] Connection reset  (expected 413)
+[PASS] VALID_GET           HTTP/1.1 200 OK  (1.2 ms)
+[FAIL] CHUNKED_VALID       got [HTTP/1.1 500 ...]  expected 200|201
+[ERR ] BODY_TOO_BIG        Connection reset (expected 413)
 ```
 
-A progress bar summarises results at the end:
+Résumé final :
 
 ```
-  ████████████████████░░░░░░░░░░  98 passed / 4 failed / 1 errors / 103 total
+████████████████████░░░░░░░░░░  98 passed / 4 failed / 1 errors / 103 total
 ```
 
 ---
 
-## Behaviour without arguments
+## 🤖 Comportement automatique
 
-Running `python3 tester.py` with no arguments behaves automatically:
-- If the infrastructure doesn't exist yet → runs `init`
-- If it exists but the server isn't up → prints the launch command and exits
-- If it exists and the server is up → runs all tests
+Si vous lancez :
+
+```bash
+python3 tester.py
+```
+
+Le script s’adapte automatiquement :
+
+* 📦 Infra absente → `init`
+* 🚫 Serveur non lancé → affiche la commande à exécuter
+* ✅ Tout est prêt → lance les tests
 
 ---
 
-## Notes
+## 📝 Remarques
 
-- The CGI test requires `python3` at `/usr/bin/python3`. Adjust `cgi_extension` in `tester.conf` if your path differs.
-- `clean` removes `www/`, `logs/`, and `tester.conf`. Your `tester.py` is never touched.
-- Tests marked `(200|201)` or `(200|404)` accept multiple valid codes — implementations may differ on details the subject leaves open.
-- The subject says *"a request to your server should never hang indefinitely"* — the slowloris tests verify exactly this.
+* Le CGI suppose `python3` disponible à `/usr/bin/python3`
+* `clean` supprime uniquement les fichiers générés
+* Certains tests acceptent plusieurs codes (`200|201`, etc.)
+* Les tests slowloris vérifient que le serveur **ne bloque jamais**
+
+---
+
+## 💡 Objectif
+
+Ce tester est conçu pour être :
+
+* **Exhaustif** → couvre tous les points du sujet
+* **Automatique** → zéro setup manuel
+* **Strict** → détecte les bugs subtils
+* **Pragmatique** → tolère les variations autorisées
+
+---
+
+## 🧑‍💻 Contribution
+
+Les contributions sont les bienvenues :
+
+* Ajout de tests edge cases
+* Amélioration des messages d’erreur
+* Optimisation des performances
+
+---
+
+## 📜 Licence
+
+Libre d’utilisation dans le cadre du projet Webserv.
+
+---
+
+**Bon courage pour votre Webserv 🚀**
